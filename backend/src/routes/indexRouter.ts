@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 
 import { Router } from 'express';
 
+import { formatDate } from '../lib/date.js';
 import controller from '../lib/serverContoller.js';
 
 const router = Router();
@@ -13,7 +14,7 @@ router.post('/run', async (req: Request, res: Response) => {
     case 0:
       res.sendStatus(200);
       console.log(
-        `${new Date(Date.now()).toDateString()}: Successfully started server`
+        `${formatDate(new Date(Date.now()))}: Successfully started server`
       );
       break;
     case 1:
@@ -32,7 +33,7 @@ router.post('/stop', async (req: Request, res: Response) => {
     case 0:
       res.sendStatus(200);
       console.log(
-        `${new Date(Date.now()).toDateString()}: Successfully stopped server`
+        `${formatDate(new Date(Date.now()))}: Successfully stopped server`
       );
       break;
     case 1:
