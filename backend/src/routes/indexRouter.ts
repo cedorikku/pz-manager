@@ -7,8 +7,8 @@ import controller from '../lib/serverContoller.js';
 
 const router = Router();
 
-router.post('/run', async (req: Request, res: Response) => {
-  const runCode: number = await controller.run();
+router.post('/start', async (req: Request, res: Response) => {
+  const runCode: number = await controller.start();
 
   switch (runCode) {
     case 0:
@@ -45,7 +45,7 @@ router.post('/stop', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/is-active', async (req: Request, res: Response) => {
+router.get('/status', async (req: Request, res: Response) => {
   const isActive: boolean = await controller.checkStatus();
   res.status(200).send(isActive);
 });

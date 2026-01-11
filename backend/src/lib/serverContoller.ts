@@ -17,7 +17,7 @@ export async function checkStatus(): Promise<boolean> {
   }
 }
 
-export async function run(): Promise<number> {
+export async function start(): Promise<number> {
   const isActive = await checkStatus();
 
   // Server already running
@@ -49,6 +49,6 @@ export async function stop(): Promise<number> {
 
 export default {
   checkStatus,
-  run,
+  start,
   stop,
 };
