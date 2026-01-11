@@ -1,0 +1,9 @@
+services:
+  bot:
+    build: .
+    container_name: discord-server-bot
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs # Maps local 'logs' folder to container
+    restart: always
