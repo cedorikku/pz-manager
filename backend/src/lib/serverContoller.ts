@@ -7,13 +7,29 @@ const execPromise = promisify(child_process.exec);
 const COMPOSE_FILE = loadComposeFile();
 const CONTAINER_NAME = process.env.CONTAINER_NAME || 'server-1';
 
-export async function checkStatus(): Promise<boolean> {
+export async function checkStatus(): Promise<string> {
+  const command = `docker container inspect --format '{{json .State.Health}}' ${CONTAINER_NAME}`;
+
+  // The name of the container is tightly coupled with its definition in compose
   try {
-    // The name of the container is tightly coupled with its definition in compose
-    await execPromise(`docker ps | grep ${CONTAINER_NAME}`);
-    return true;
-  } catch {
-    return false;
+    const { stdout } = await execPromise(command);
+
+    const healthJson = JSON.parse(stdout);
+    const status = healthJson['Status'];
+
+    // Either:
+    // - 'starting'
+    // - 'healthy'
+    return status;
+  } catch (err) {
+    // inactive'
+    if (err && /no such container/i.test(err.toString())) {
+      return 'inactive';
+    }
+
+    // error
+    console.error(err);
+    return 'failed';
   }
 }
 

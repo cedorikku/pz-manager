@@ -46,8 +46,8 @@ router.post('/stop', async (req: Request, res: Response) => {
 });
 
 router.get('/status', async (req: Request, res: Response) => {
-  const isActive: boolean = await controller.checkStatus();
-  res.status(200).send(isActive);
+  const status: string = await controller.checkStatus();
+  res.status(200).send(status);
 });
 
 export default router;
