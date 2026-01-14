@@ -170,7 +170,7 @@ class MyBot(commands.Bot):
                 activity = discord.Game(name="🟠 Server Offline")
                 status = discord.Status.idle
             case "failed":
-                activity = discord.Game(name="🟠 Server Failed (check logs)")
+                activity = discord.Game(name="🔴 Server Failed (check logs)")
                 status = discord.Status.dnd
             case _:
                 activity = discord.Game(name="⁉️")
