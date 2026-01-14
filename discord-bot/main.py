@@ -161,16 +161,16 @@ class MyBot(commands.Bot):
 
         match data:
             case "starting":
-                activity = discord.Game(name="🟡 Spinning up")
+                activity = discord.Game(name="🟡 Server Spinning up")
                 status = discord.Status.online
             case "healthy":
-                activity = discord.Game(name="🟢 Online")
+                activity = discord.Game(name="🟢 Server Online")
                 status = discord.Status.online
             case "inactive":
-                activity = discord.Game(name="🟠 Offline")
+                activity = discord.Game(name="🟠 Server Offline")
                 status = discord.Status.idle
             case "failed":
-                activity = discord.Game(name="🟠 Failed (check logs)")
+                activity = discord.Game(name="🟠 Server Failed (check logs)")
                 status = discord.Status.dnd
             case _:
                 activity = discord.Game(name="⁉️")
