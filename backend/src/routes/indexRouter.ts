@@ -13,17 +13,18 @@ router.post('/start', async (req: Request, res: Response) => {
 
   switch (result) {
     case 'success':
-      res.sendStatus(200);
+      res.sendStatus(204);
       console.log(
         `${formatDate(new Date(Date.now()))}: Successfully started server`
       );
       break;
     case 'ignored':
-      res.sendStatus(400);
-      console.log("Server's already started");
+      res.sendStatus(409);
       break;
     default: // like -1
-      res.sendStatus(500);
+      res.status(500).json({
+        error: result.error,
+      });
   }
 });
 
@@ -32,17 +33,18 @@ router.post('/stop', async (req: Request, res: Response) => {
 
   switch (result) {
     case 'success':
-      res.sendStatus(200);
+      res.sendStatus(204);
       console.log(
         `${formatDate(new Date(Date.now()))}: Successfully stopped server`
       );
       break;
     case 'ignored':
-      res.sendStatus(400);
-      console.log("Server isn't running");
+      res.sendStatus(409);
       break;
     default: // like -1
-      res.sendStatus(500);
+      res.status(500).json({
+        error: result.error,
+      });
   }
 });
 

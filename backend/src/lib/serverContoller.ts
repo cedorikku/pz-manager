@@ -7,7 +7,7 @@ const execPromise = promisify(child_process.exec);
 const COMPOSE_FILE = loadComposeFile();
 const CONTAINER_NAME = process.env.CONTAINER_NAME || 'server-1';
 
-export type CommandResult = 'success' | 'ignored' | 'error';
+export type CommandResult = 'success' | 'ignored' | { error: string | object };
 export type Status = 'failed' | 'healthy' | 'inactive' | 'starting';
 
 export async function checkStatus(): Promise<Status> {
@@ -46,8 +46,8 @@ export async function start(): Promise<CommandResult> {
     await execPromise(`docker compose -f ${COMPOSE_FILE} up -d`);
     return 'success';
   } catch (err) {
-    console.error(`Error running docker: ${err}`);
-    return 'error';
+    console.error(`Error running docker container: ${err}`);
+    return { error: err! };
   }
 }
 
@@ -61,8 +61,8 @@ export async function stop(): Promise<CommandResult> {
     await execPromise(`docker compose -f ${COMPOSE_FILE} down`);
     return 'success';
   } catch (err) {
-    console.error(`Error stopping docker: ${err}`);
-    return 'error';
+    console.error(`Error stopping docker container: ${err}`);
+    return { error: err! };
   }
 }
 
