@@ -48,12 +48,12 @@ class ServerManager(commands.Cog):
             await interaction.followup.send("❌ Connection Error: Backend is unalive :<")
             return
 
-        if response.status_code == 200:
+        if response.status_code == 204:
             await interaction.followup.send("🚀 **Zomboid Server started**")
-        elif response.status_code == 400:
+        elif response.status_code == 409:
             await interaction.followup.send("ℹ️ **Zomboid Server already started**")
         elif response.status_code == 500:
-            await interaction.followup.send("🔥 **Backend is not working as intended**")
+            await interaction.followup.send(f"🔥 **Backend Error:** {response.json().error}")
         else:
             await interaction.followup.send(f"Unexpected status: {response.status_code}")
 
@@ -66,12 +66,12 @@ class ServerManager(commands.Cog):
             await interaction.followup.send("❌ Connection Error: Backend is unreachable.")
             return
 
-        if response.status_code == 200:
+        if response.status_code == 204:
             await interaction.followup.send("🛑 **Zomboid Server stopped successfully**")
-        elif response.status_code == 400:
+        elif response.status_code == 409:
             await interaction.followup.send("⚠️ **Zomboid Server already down**")
         elif response.status_code == 500:
-            await interaction.followup.send("🔥 **Backend is not working as intended**")
+            await interaction.followup.send(f"🔥 **Backend Error:** {response.json().error}")
         else:
             await interaction.followup.send(f"Unexpected status: {response.status_code}")
 
@@ -101,8 +101,6 @@ class ServerManager(commands.Cog):
                     await interaction.followup.send(
                         f"❓ Received 200, but unknown body: `{result}`"
                     )
-        elif response.status_code == 500:
-            await interaction.followup.send("🔥 **Backend is not working as intended**")
         else:
             await interaction.followup.send(f"Unexpected status: {response.status_code}")
 
@@ -110,7 +108,6 @@ class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
         self.sse_task: asyncio.Task[None] | None = None
-
     
     async def setup_hook(self):
         await self.add_cog(ServerManager(self))
