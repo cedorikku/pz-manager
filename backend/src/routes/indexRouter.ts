@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { Status } from '../lib/serverContoller.js';
+import type { CommandResult, Status } from '../lib/serverContoller.js';
 
 import { Router } from 'express';
 
@@ -9,16 +9,16 @@ import controller from '../lib/serverContoller.js';
 const router = Router();
 
 router.post('/start', async (req: Request, res: Response) => {
-  const runCode: number = await controller.start();
+  const result: CommandResult = await controller.start();
 
-  switch (runCode) {
-    case 0:
+  switch (result) {
+    case 'success':
       res.sendStatus(200);
       console.log(
         `${formatDate(new Date(Date.now()))}: Successfully started server`
       );
       break;
-    case 1:
+    case 'ignored':
       res.sendStatus(400);
       console.log("Server's already started");
       break;
@@ -28,16 +28,16 @@ router.post('/start', async (req: Request, res: Response) => {
 });
 
 router.post('/stop', async (req: Request, res: Response) => {
-  const stopCode: number = await controller.stop();
+  const result: CommandResult = await controller.stop();
 
-  switch (stopCode) {
-    case 0:
+  switch (result) {
+    case 'success':
       res.sendStatus(200);
       console.log(
         `${formatDate(new Date(Date.now()))}: Successfully stopped server`
       );
       break;
-    case 1:
+    case 'ignored':
       res.sendStatus(400);
       console.log("Server isn't running");
       break;

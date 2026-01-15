@@ -7,6 +7,7 @@ const execPromise = promisify(child_process.exec);
 const COMPOSE_FILE = loadComposeFile();
 const CONTAINER_NAME = process.env.CONTAINER_NAME || 'server-1';
 
+export type CommandResult = 'success' | 'ignored' | 'error';
 export type Status = 'failed' | 'healthy' | 'inactive' | 'starting';
 
 export async function checkStatus(): Promise<Status> {
@@ -35,33 +36,33 @@ export async function checkStatus(): Promise<Status> {
   }
 }
 
-export async function start(): Promise<number> {
+export async function start(): Promise<CommandResult> {
   const status: Status = await checkStatus();
 
   // Server already running
-  if (status === 'starting' || status === 'healthy') return 1;
+  if (status === 'starting' || status === 'healthy') return 'ignored';
 
   try {
     await execPromise(`docker compose -f ${COMPOSE_FILE} up -d`);
-    return 0;
+    return 'success';
   } catch (err) {
     console.error(`Error running docker: ${err}`);
-    return -1;
+    return 'error';
   }
 }
 
-export async function stop(): Promise<number> {
+export async function stop(): Promise<CommandResult> {
   const status: Status = await checkStatus();
 
   // Server isn't running
-  if (status === 'inactive') return 1;
+  if (status === 'inactive') return 'ignored';
 
   try {
     await execPromise(`docker compose -f ${COMPOSE_FILE} down`);
-    return 0;
+    return 'success';
   } catch (err) {
     console.error(`Error stopping docker: ${err}`);
-    return -1;
+    return 'error';
   }
 }
 
