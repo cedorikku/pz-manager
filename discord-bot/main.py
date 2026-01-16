@@ -104,6 +104,42 @@ class ServerManager(commands.Cog):
         else:
             await interaction.followup.send(f"Unexpected status: {response.status_code}")
 
+    @app_commands.command(name="pz_players", description="Lists all current players in server")
+    async def list_players(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        response = await self.api_request("GET", "players")
+
+        if response is None:
+            await interaction.followup.send("❌ Connection Error: Backend is unreachable.")
+            return
+
+        match response.status_code:
+            case 200:
+                try:
+                    result = response.json()
+                except ValueError:
+                    await interaction.followup.send("Received non-JSON response")
+                    return
+
+                if (not isinstance(result, list) or len(result) == 0):
+                    await interaction.followup.send("🥶 No Players Online")
+
+                message = f"Players Online: {len(result)}"
+                message += ("```")
+
+                for name in result:
+                    message += f"\n- {name}"
+
+                message += ("```")
+                await interaction.followup.send(message)
+            case 409:
+                await interaction.followup.send("⚠️ **Zomboid Server isn't online**")
+            case 500: 
+                await interaction.followup.send(f"🔥 **Backend Error:** {response.json().error}")
+            case _:
+                await interaction.followup.send(f"Unexpected status: {response.status_code}")
+
+
 class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
@@ -151,7 +187,7 @@ class MyBot(commands.Bot):
         """
         current possible data from sse could be:
         - starting
-        - healthy
+        - healthy {player_count}: int
         - inactive
         - failed
         """
@@ -160,8 +196,10 @@ class MyBot(commands.Bot):
             case "starting":
                 activity = discord.Game(name="🟡 Server Spinning up")
                 status = discord.Status.online
-            case "healthy":
-                activity = discord.Game(name="🟢 Server Online")
+            case s if s.startswith("healthy"):
+                player_count = int(s.removeprefix("healthy "))
+                activity_name = "Server Online" if player_count == 0 else f"Server Online ({player_count} online)"
+                activity = discord.Game(name=f"🟢 {activity_name}")
                 status = discord.Status.online
             case "inactive":
                 activity = discord.Game(name="🟠 Server Offline")

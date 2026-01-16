@@ -58,24 +58,60 @@ router.get('/presence', async (req: Request, res: Response) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  // Initial assumes that server is initially inactive
-  let status: Status = 'inactive';
-  res.write(`data: ${status}\n\n`);
-
   req.on('close', () => {
     res.end();
   });
+
+  // Initial assumes that server is inactive and has 0 players
+  let currentStatus: Status = 'inactive';
+  let currentPlayerCount: number = 0;
+  res.write(`data: ${currentStatus}\n\n`);
 
   const _updateInterval = 10000; // 10 seconds
   while (true) {
     const newStatus: Status = await controller.checkStatus();
 
-    if (newStatus !== status) {
-      status = newStatus;
-      res.write(`data: ${status}\n\n`);
+    if (newStatus === 'healthy') {
+      const _players: string[] | CommandResult = await controller.getPlayers();
+
+      const newPlayerCount = Array.isArray(_players) ? _players.length : 0;
+
+      if (
+        currentStatus !== newStatus ||
+        currentPlayerCount !== newPlayerCount
+      ) {
+        currentStatus = newStatus;
+        currentPlayerCount = newPlayerCount;
+        res.write(`data: ${currentStatus} ${currentPlayerCount}\n\n`);
+      }
+    } else {
+      if (currentStatus !== newStatus) {
+        currentStatus = newStatus;
+        res.write(`data: ${currentStatus}\n\n`);
+      }
     }
 
     await new Promise((resolve) => setTimeout(resolve, _updateInterval));
+  }
+});
+
+router.get('/players', async (req: Request, res: Response) => {
+  const result: string[] | CommandResult = await controller.getPlayers();
+
+  // FIX: (low) Add custom type soon (e.g. PlayerCommandResult)
+  // - works for now
+  if (result === 'success') {
+    throw new Error("This string type literal isn't supported");
+  }
+
+  if (result === 'ignored') {
+    return res.sendStatus(409);
+  } else if (Array.isArray(result)) {
+    return res.status(200).json(result);
+  } else {
+    res.status(500).json({
+      error: result.error,
+    });
   }
 });
 
