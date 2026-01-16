@@ -81,6 +81,7 @@ router.get('/presence', async (req: Request, res: Response) => {
         currentPlayerCount !== newPlayerCount
       ) {
         currentStatus = newStatus;
+        currentPlayerCount = newPlayerCount;
         res.write(`data: ${currentStatus} ${currentPlayerCount}\n\n`);
       }
     } else {
