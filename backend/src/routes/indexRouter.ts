@@ -30,7 +30,7 @@ router.post('/start', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/start/status', async (req: Request, res: Response) => {
+router.get('/start/status', async (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');

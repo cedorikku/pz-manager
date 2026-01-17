@@ -53,7 +53,7 @@ class ServerManager(commands.Cog):
                         headers={"Accept": "text/event-stream"}
                     ) as resp:
                         if resp.status != 200:
-                            logging.error(f"SSE connection failed with status: {resp.status}")
+                            logging.error(f"Start Command SSE connection failed with status: {resp.status}")
                             raise RuntimeError("Failed to connect to /start/status endpoint.")
 
                         async for raw_line in resp.content:
@@ -65,6 +65,7 @@ class ServerManager(commands.Cog):
                             if line.startswith("event:"):
                                 event = line.removeprefix("event:").strip()
                                 if event == "cancelled":
+                                    run = False
                                     await self.notify_start_user(event, interaction)
                                     return
 
