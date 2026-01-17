@@ -78,11 +78,16 @@ class ServerManager(commands.Cog):
 
     async def notify_start_user(self, status: str, interaction: discord.Interaction):
         user = interaction.user
+
         match status:
+            case "starting":
+                await interaction.followup.send(f"⏳ **Zomboid Server is starting...**")
             case "healthy":
-                _ = await interaction.response.send_message(f"🗣️ It's zomboid-ing time! {user.mention}");
+                await interaction.followup.send(f"🗣️ **It's zomboid-ing time! {user.mention}**")
+            case "failed":
+                await interaction.followup.send(f"🔴 **Server failed to start! {user.mention}**")
             case "cancelled":
-                _ = await interaction.response.send_message(f"😔 The server you started was cancelled by another user {user.mention}")
+                await interaction.followup.send(f"😔 **The server you started was cancelled by another human! {user.mention}**")
             case _:
                 return
 

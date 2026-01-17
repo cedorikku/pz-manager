@@ -41,12 +41,13 @@ router.get('/start/status', async (req: Request, res: Response) => {
     res.end();
   });
 
+  let status: Status = 'starting';
+  res.write(`data: starting\n\n`);
+
   // Start checking and sending only after minutes have passed
   const delay = 1000 * 60 * 3;
   await new Promise((resolve) => setTimeout(resolve, delay));
 
-  let status: Status = 'inactive';
-  res.write(`data: inactive\n\n`);
   while (status !== 'healthy') {
     status = await controller.checkStatus();
   }
