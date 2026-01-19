@@ -5,8 +5,6 @@ After=network.target
 After=pz-server-api.service
 
 [Service]
-Environment=BASE_URL=<url:port>
-Environment=API_KEY=<discord_api_key>
 Type=simple
 User=<user>
 ExecStart=docker compose -f <path-to-docker-compose.yml> up
