@@ -64,7 +64,7 @@ nano ./discord-bot/.env
 3. Link the service files as soft links
 
 ```sh
-sudo systemctl link *.service /etc/systemd/system/
+sudo systemctl link *.service
 ```
 
 4. Edit both the service files with hardcoded absolute values (replace inside the angled brackets _\<replace-me\>_):
